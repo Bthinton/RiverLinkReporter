@@ -20,10 +20,10 @@ namespace RiverLinkReporter.api
 
             //include the XML documentation
             swaggerGenOptions.DescribeAllEnumsAsStrings();
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IdenityFramework.API.xml");
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RiverLinkReporter.API.xml");
             swaggerGenOptions.IncludeXmlComments(filePath);
-            filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IdentityFramework.Models.xml");
-            swaggerGenOptions.IncludeXmlComments(filePath);
+            //filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RiverLinkReporter.Models.xml");
+            //swaggerGenOptions.IncludeXmlComments(filePath);
 
         }
 

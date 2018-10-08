@@ -26,4 +26,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="3.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RiverLinkReporter.service\RiverLinkReporter.service.csproj" />
+  </ItemGroup>
+
 </Project>
