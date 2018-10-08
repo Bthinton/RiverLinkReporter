@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace RiverLinkReporter.api.Controllers
 {
@@ -10,16 +8,26 @@ namespace RiverLinkReporter.api.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        // GET api/values
+        /// <summary>
+        /// Gets some values.
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(string[]), 200)]
+        [ProducesResponseType(typeof(NotFoundObjectResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "GetSomeValues")]
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        [Route("api/v1/GetSomeValues", Name = "GetSomeValues")]
+        public ActionResult<IEnumerable<string>> GetSomeValues()
         {
+
             return new string[] { "value1", "value2" };
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        [HttpGet]
+        [Route("api/v1/GetById", Name = "GetById")]
+        public ActionResult<string> GetById(int id)
         {
             return "value";
         }

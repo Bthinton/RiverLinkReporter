@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RiverLinkReporter.api</name>
+    </assembly>
+    <members>
+        <member name="M:RiverLinkReporter.api.Controllers.ValuesController.GetSomeValues">
+            <summary>
+            Gets some values.
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

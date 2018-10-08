@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RiverLinkReporter.service.Data;
+using IdentityFramework.Service;
 
 namespace RiverLinkReporter.web
 {
