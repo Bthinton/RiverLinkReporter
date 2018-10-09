@@ -4,7 +4,7 @@
         <name>RiverLinkReporter.api</name>
     </assembly>
     <members>
-        <member name="M:RiverLinkReporter.api.Controllers.ValuesController.GetSomeValues">
+        <member name="M:RiverLinkReporter.api.Controllers.ValuesController.GetSomeValues(System.String[])">
             <summary>
             Gets some values.
             </summary>

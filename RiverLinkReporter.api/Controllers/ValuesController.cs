@@ -20,7 +20,6 @@ namespace RiverLinkReporter.api.Controllers
         [Route("api/v1/GetSomeValues", Name = "GetSomeValues")]
         public ActionResult<IEnumerable<string>> GetSomeValues()
         {
-
             return new string[] { "value1", "value2" };
         }
 
