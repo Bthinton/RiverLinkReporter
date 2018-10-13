@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RiverLinkReporter.api.Controllers
 {
@@ -24,11 +25,12 @@ namespace RiverLinkReporter.api.Controllers
         }
 
         // GET api/values/5
+        [Authorize]
         [HttpGet]
         [Route("api/v1/GetById", Name = "GetById")]
         public ActionResult<string> GetById(int id)
         {
-            return "value";
+            return "You are logged in securely.";
         }
 
         // POST api/values

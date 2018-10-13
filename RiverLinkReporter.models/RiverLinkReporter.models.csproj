@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Users\Wurmskull\Source\Repos\RiverLinkReporter\RiverLinkReporter.models\RiverLinkReporter.models.xml</DocumentationFile>
+    <DocumentationFile>..\RiverLinkReporter.api\bin\Debug\netcoreapp2.1\RiverLinkReporter.models.xml</DocumentationFile>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
 </Project>

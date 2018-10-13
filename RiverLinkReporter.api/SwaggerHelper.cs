@@ -18,12 +18,20 @@ namespace RiverLinkReporter.api
                 Description = "An API for testing the Identity Framework"
             });
 
+            swaggerGenOptions.AddSecurityDefinition("Bearer", new ApiKeyScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = "header",
+                Type = "apiKey"
+            });
+
             //include the XML documentation
             swaggerGenOptions.DescribeAllEnumsAsStrings();
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RiverLinkReporter.API.xml");
             swaggerGenOptions.IncludeXmlComments(filePath);
-            //filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RiverLinkReporter.Models.xml");
-            //swaggerGenOptions.IncludeXmlComments(filePath);
+            filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RiverLinkReporter.Models.xml");
+            swaggerGenOptions.IncludeXmlComments(filePath);
 
         }
 
