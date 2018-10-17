@@ -179,6 +179,7 @@ namespace RiverLinkReporter.Service
                 if (!returnvalue.EmailConfirmed)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
+                    return returnvalue;
                 }               
                 var code = await _UserManager.GeneratePasswordResetTokenAsync(returnvalue);
 
