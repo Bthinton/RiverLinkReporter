@@ -10,6 +10,7 @@ namespace RiverLinkReporter.models
         public string FromAddress { get; set; }
         public string FromName { get; set; }
         public string ConfirmEmailUrl { get; set; }
+        public string ForgotPasswordUrl { get; set; }
         public bool LockoutOnFailure { get; set; }
     }
 }

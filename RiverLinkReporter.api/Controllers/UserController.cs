@@ -74,7 +74,7 @@ namespace RiverLinkReporter.API.Controllers
         [Route("api/v1/Register", Name = "Register")]
         public async Task<IActionResult> Register(string Email, string Password)
         {
-            _Logger.LogInformation($"Refgistering user {Email}...");
+            _Logger.LogInformation($"Registering user {Email}...");
             IdentityResult returnValue = null;
 
             #region Validate Parameters
@@ -152,7 +152,47 @@ namespace RiverLinkReporter.API.Controllers
             return Ok(returnValue);
         }
 
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "ForgotPassword")]
+        [HttpPost]
+        [Route("api/v1/ForgotPassword", Name = "ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string Email)
+        {
+            _Logger.LogInformation($"Login for user: {Email}...");
+            IdentityUser returnValue = null;
 
+            #region Validate Parameters
+            if (String.IsNullOrEmpty(Email))
+                ModelState.AddModelError($"Password Retrieval Error", $"The {nameof(Email)} cannot be empty");
+
+            if (!ModelState.IsValid)
+            {
+                LogInvalidState();
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                _Logger.LogDebug($"ModelState is valid.");
+            }
+            #endregion Validate Parameters
+
+            try
+            {
+                returnValue = await _UserService.ForgotPassword(Email);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"ForgotPassword Unexpected Error: {ex}");
+                return StatusCode(500, $"ForgotPassword Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"Password Reset Email Sent.");
+            return Ok(returnValue);
+        }
 
         private void LogInvalidState()
         {

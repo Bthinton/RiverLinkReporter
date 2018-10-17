@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Remotion.Linq.Parsing.ExpressionVisitors.Transformation.PredefinedTransformations;
 
 namespace RiverLinkReporter.Service
 {
@@ -20,6 +21,8 @@ namespace RiverLinkReporter.Service
         Task<IdentityResult> Register(string Email, string Password);
 
         Task<string> Login(string Email, string Password, bool RememberMe);
+
+        Task<IdentityUser> ForgotPassword(string Email);
     }
 
     public class UserService : IUserService
@@ -167,5 +170,32 @@ namespace RiverLinkReporter.Service
             }
         }
 
+        public async Task<IdentityUser> ForgotPassword(string Email)
+        {
+            IdentityUser returnvalue = null;
+            if (Email != null)
+            {
+                returnvalue = await _UserManager.FindByEmailAsync(Email);
+                if (!returnvalue.EmailConfirmed)
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                }               
+                var code = await _UserManager.GeneratePasswordResetTokenAsync(returnvalue);
+
+                var callbackUrl = $"{_Settings.ForgotPasswordUrl}?userId={returnvalue.Id}&code={code}";
+
+                await _emailService.SendEmailAsync(Email, "Reset Password",
+                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                _Logger.LogInformation("Reset Password Email Sent.");
+            }
+            else
+            {
+                string errorMessage = $"Password Reset Error: {System.Environment.NewLine}";
+
+                throw new Exception(errorMessage);
+            }
+            return returnvalue;
+        }
     }
 }
