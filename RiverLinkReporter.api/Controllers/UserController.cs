@@ -161,7 +161,7 @@ namespace RiverLinkReporter.API.Controllers
         [Route("api/v1/ForgotPassword", Name = "ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(string Email)
         {
-            _Logger.LogInformation($"Login for user: {Email}...");
+            _Logger.LogInformation($"Send email to reset password for user: {Email}...");
             IdentityUser returnValue = null;
 
             #region Validate Parameters
@@ -191,6 +191,54 @@ namespace RiverLinkReporter.API.Controllers
 
             //return the new certificate
             _Logger.LogInformation($"Password Reset Email Sent.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "ResetPassword")]
+        [HttpPost]
+        [Route("api/v1/ResetPassword", Name = "ResetPassword")]
+        public async Task<IActionResult> ResetPassword(string Email, string Password, string ConfirmPassword)
+        {
+            _Logger.LogInformation($"Reset password for user: {Email}...");
+            string returnValue = null;
+
+            #region Validate Parameters
+            if (String.IsNullOrEmpty(Email))
+                ModelState.AddModelError($"Password reset Error", $"The {nameof(Email)} cannot be empty");
+
+            if (String.IsNullOrEmpty(Password))
+                ModelState.AddModelError($"Password reset Error", $"The {nameof(Password)} cannot be empty");
+
+            if (String.IsNullOrEmpty(ConfirmPassword))
+                ModelState.AddModelError($"Password reset Error", $"The {nameof(ConfirmPassword)} cannot be empty");
+
+            if (!ModelState.IsValid)
+            {
+                LogInvalidState();
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                _Logger.LogDebug($"ModelState is valid.");
+            }
+            #endregion Validate Parameters
+
+            try
+            {
+                returnValue = await _UserService.ResetPassword(Email, Password, ConfirmPassword);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"ResetPassword Unexpected Error: {ex}");
+                return StatusCode(500, $"ResetPassword Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"Password Reset.");
             return Ok(returnValue);
         }
 

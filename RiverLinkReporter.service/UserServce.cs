@@ -23,6 +23,8 @@ namespace RiverLinkReporter.Service
         Task<string> Login(string Email, string Password, bool RememberMe);
 
         Task<IdentityUser> ForgotPassword(string Email);
+
+        Task<string> ResetPassword(string Email, string Password, string ConfirmPassword);
     }
 
     public class UserService : IUserService
@@ -126,7 +128,6 @@ namespace RiverLinkReporter.Service
                     throw new Exception(errorMessage);
                 }
             }
-
             return returnvalue;
         }
 
@@ -161,7 +162,6 @@ namespace RiverLinkReporter.Service
 
                     throw new Exception(errorMessage);
                 }
-
                 return returnvalue;
             }
             else
@@ -189,6 +189,29 @@ namespace RiverLinkReporter.Service
                     $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                 _Logger.LogInformation("Reset Password Email Sent.");
+            }
+            else
+            {
+                string errorMessage = $"Password Reset Email Error: {System.Environment.NewLine}";
+
+                throw new Exception(errorMessage);
+            }
+            return returnvalue;
+        }
+
+        public async Task<string> ResetPassword(string Email, string Password, string ConfirmPassword)
+        {
+            string returnvalue = null;
+            if (ValidateUser(Email, Password))
+            {
+                var user = await _UserManager.FindByEmailAsync(Email);
+                var code = await _UserManager.GeneratePasswordResetTokenAsync(user);
+
+                var result = await _UserManager.ResetPasswordAsync(user, code, Password);
+                if (result.Succeeded)
+                {
+                    _Logger.LogInformation("User password reset.");
+                }
             }
             else
             {
