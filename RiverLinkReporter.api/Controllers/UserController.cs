@@ -1,29 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
-using RiverLinkReporter.models;
-using RiverLinkReporter.service;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using NLog;
-using Swashbuckle.AspNetCore.Annotations;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using RiverLinkReporter.models;
 using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace RiverLinkReporter.API.Controllers
 {
@@ -39,6 +25,7 @@ namespace RiverLinkReporter.API.Controllers
         private readonly ILogger<UserController> _Logger;
         private readonly UserManager<IdentityUser> _UserManager;
         private readonly IEmailService _emailService;
+
         private readonly RiverLinkReporter_JWTSettings _TokenOptions;
         //private NLog.ILogger _Logger => LogManager.GetLogger(this.GetType().FullName);
 
@@ -78,7 +65,8 @@ namespace RiverLinkReporter.API.Controllers
             IdentityResult returnValue = null;
 
             #region Validate Parameters
-            if (String.IsNullOrEmpty(Email))
+
+            if (string.IsNullOrEmpty(Email))
                 ModelState.AddModelError($"Register Error", $"The {nameof(Email)} cannot be zero");
 
             if (!ModelState.IsValid)
@@ -86,10 +74,9 @@ namespace RiverLinkReporter.API.Controllers
                 LogInvalidState();
                 return BadRequest(ModelState);
             }
-            else
-            {
-                _Logger.LogDebug($"ModelState is valid.");
-            }
+
+            _Logger.LogDebug($"ModelState is valid.");
+
             #endregion Validate Parameters
 
             try
@@ -120,10 +107,11 @@ namespace RiverLinkReporter.API.Controllers
             string returnValue = null;
 
             #region Validate Parameters
-            if (String.IsNullOrEmpty(Email))
+
+            if (string.IsNullOrEmpty(Email))
                 ModelState.AddModelError($"Login Error", $"The {nameof(Email)} cannot be empty");
 
-            if (String.IsNullOrEmpty(Password))
+            if (string.IsNullOrEmpty(Password))
                 ModelState.AddModelError($"Login Error", $"The {nameof(Password)} cannot be empty");
 
             if (!ModelState.IsValid)
@@ -131,10 +119,9 @@ namespace RiverLinkReporter.API.Controllers
                 LogInvalidState();
                 return BadRequest(ModelState);
             }
-            else
-            {
-                _Logger.LogDebug($"ModelState is valid.");
-            }
+
+            _Logger.LogDebug($"ModelState is valid.");
+
             #endregion Validate Parameters
 
             try
@@ -165,7 +152,8 @@ namespace RiverLinkReporter.API.Controllers
             IdentityUser returnValue = null;
 
             #region Validate Parameters
-            if (String.IsNullOrEmpty(Email))
+
+            if (string.IsNullOrEmpty(Email))
                 ModelState.AddModelError($"Password Retrieval Error", $"The {nameof(Email)} cannot be empty");
 
             if (!ModelState.IsValid)
@@ -173,10 +161,9 @@ namespace RiverLinkReporter.API.Controllers
                 LogInvalidState();
                 return BadRequest(ModelState);
             }
-            else
-            {
-                _Logger.LogDebug($"ModelState is valid.");
-            }
+
+            _Logger.LogDebug($"ModelState is valid.");
+
             #endregion Validate Parameters
 
             try
@@ -207,13 +194,14 @@ namespace RiverLinkReporter.API.Controllers
             string returnValue = null;
 
             #region Validate Parameters
-            if (String.IsNullOrEmpty(Email))
+
+            if (string.IsNullOrEmpty(Email))
                 ModelState.AddModelError($"Password reset Error", $"The {nameof(Email)} cannot be empty");
 
-            if (String.IsNullOrEmpty(Password))
+            if (string.IsNullOrEmpty(Password))
                 ModelState.AddModelError($"Password reset Error", $"The {nameof(Password)} cannot be empty");
 
-            if (String.IsNullOrEmpty(ConfirmPassword))
+            if (string.IsNullOrEmpty(ConfirmPassword))
                 ModelState.AddModelError($"Password reset Error", $"The {nameof(ConfirmPassword)} cannot be empty");
 
             if (!ModelState.IsValid)
@@ -221,10 +209,9 @@ namespace RiverLinkReporter.API.Controllers
                 LogInvalidState();
                 return BadRequest(ModelState);
             }
-            else
-            {
-                _Logger.LogDebug($"ModelState is valid.");
-            }
+
+            _Logger.LogDebug($"ModelState is valid.");
+
             #endregion Validate Parameters
 
             try
@@ -242,21 +229,40 @@ namespace RiverLinkReporter.API.Controllers
             return Ok(returnValue);
         }
 
-        private void LogInvalidState()
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "Logout")]
+        [HttpPost]
+        [Route("api/v1/Logout", Name = "Logout")]
+        public async Task<IActionResult> Logout()
         {
-            string errors = "";
-
-            foreach (var modelState in ViewData.ModelState.Values)
+            _Logger.LogInformation($"Logging out current user");
+            string returnValue = null;
+            try
             {
-                foreach (ModelError error in modelState.Errors)
-                {
-                    errors += error + " ";
-                }
+                returnValue = await _UserService.Logout();
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Logout Unexpected Error: {ex}");
+                return StatusCode(500, $"Logout Unexpected Error: {ex}");
             }
 
-            _Logger.LogError($"Invalid ModelState: {errors}");
+            //return the new certificate
+            _Logger.LogInformation($"Logout complete.");
+            return Ok(returnValue);
         }
 
+        private void LogInvalidState()
+        {
+            var errors = "";
 
+            foreach (var modelState in ViewData.ModelState.Values)
+            foreach (var error in modelState.Errors)
+                errors += error + " ";
+            _Logger.LogError($"Invalid ModelState: {errors}");
+        }
     }
 }

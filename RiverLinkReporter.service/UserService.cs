@@ -25,6 +25,8 @@ namespace RiverLinkReporter.Service
         Task<IdentityUser> ForgotPassword(string Email);
 
         Task<string> ResetPassword(string Email, string Password, string ConfirmPassword);
+
+        Task<string> Logout();
     }
 
     public class UserService : IUserService
@@ -76,20 +78,21 @@ namespace RiverLinkReporter.Service
 
         private string GenerateToken(string username)
         {
-            var claims = new Claim[]
+            var claims = new[]
             {
                 new Claim(ClaimTypes.Name, username),
                 new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
-                new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now.AddDays(1)).ToUnixTimeSeconds().ToString()),
+                new Claim(JwtRegisteredClaimNames.Exp,
+                    new DateTimeOffset(DateTime.Now.AddDays(1)).ToUnixTimeSeconds().ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_TokenOptions.SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _TokenOptions.Issuer,
-                audience: _TokenOptions.Audience,
-                claims: claims,
+                _TokenOptions.Issuer,
+                _TokenOptions.Audience,
+                claims,
                 expires: DateTime.Now.AddMinutes(60),
                 signingCredentials: creds);
 
@@ -108,26 +111,26 @@ namespace RiverLinkReporter.Service
                     return returnvalue;
                 }
 
-                var result = await _SignInManager.PasswordSignInAsync(Email, Password, RememberMe, lockoutOnFailure: _Settings.LockoutOnFailure);
+                var result =
+                    await _SignInManager.PasswordSignInAsync(Email, Password, RememberMe, _Settings.LockoutOnFailure);
                 if (result.Succeeded)
                 {
                     _Logger.LogInformation("User logged in.");
                     return GenerateToken(Email);
                 }
-                if (result.RequiresTwoFactor)
-                {
-                    _Logger.LogInformation("User requires 2FA.");
-                }
+
+                if (result.RequiresTwoFactor) _Logger.LogInformation("User requires 2FA.");
                 if (result.IsLockedOut)
                 {
                     _Logger.LogWarning("User account locked out.");
                 }
                 else
                 {
-                    string errorMessage = $"Login failed. Please check your username and password and try again.";
+                    var errorMessage = $"Login failed. Please check your username and password and try again.";
                     throw new Exception(errorMessage);
                 }
             }
+
             return returnvalue;
         }
 
@@ -137,7 +140,7 @@ namespace RiverLinkReporter.Service
 
             if (ValidateUser(Email, Password))
             {
-                var user = new IdentityUser { UserName = Email, Email = Email };
+                var user = new IdentityUser {UserName = Email, Email = Email};
                 returnvalue = await _UserManager.CreateAsync(user, Password);
                 if (returnvalue.Succeeded)
                 {
@@ -153,21 +156,17 @@ namespace RiverLinkReporter.Service
                 }
                 else
                 {
-                    string errorMessage = $"Registration Error: {System.Environment.NewLine}";
+                    var errorMessage = $"Registration Error: {Environment.NewLine}";
 
-                    foreach (var error in returnvalue.Errors)
-                    {
-                        errorMessage += error.Description + System.Environment.NewLine;
-                    }
+                    foreach (var error in returnvalue.Errors) errorMessage += error.Description + Environment.NewLine;
 
                     throw new Exception(errorMessage);
                 }
+
                 return returnvalue;
             }
-            else
-            {
-                throw new Exception("Error: Model state is invalid, username and password are required.");
-            }
+
+            throw new Exception("Error: Model state is invalid, username and password are required.");
         }
 
         public async Task<IdentityUser> ForgotPassword(string Email)
@@ -176,11 +175,7 @@ namespace RiverLinkReporter.Service
             if (Email != null)
             {
                 returnvalue = await _UserManager.FindByEmailAsync(Email);
-                if (!returnvalue.EmailConfirmed)
-                {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return returnvalue;
-                }               
+                if (!returnvalue.EmailConfirmed) return returnvalue;
                 var code = await _UserManager.GeneratePasswordResetTokenAsync(returnvalue);
 
                 var callbackUrl = $"{_Settings.ForgotPasswordUrl}?userId={returnvalue.Id}&code={code}";
@@ -192,10 +187,11 @@ namespace RiverLinkReporter.Service
             }
             else
             {
-                string errorMessage = $"Password Reset Email Error: {System.Environment.NewLine}";
+                var errorMessage = $"Password Reset Email Error: {Environment.NewLine}";
 
                 throw new Exception(errorMessage);
             }
+
             return returnvalue;
         }
 
@@ -208,17 +204,23 @@ namespace RiverLinkReporter.Service
                 var code = await _UserManager.GeneratePasswordResetTokenAsync(user);
 
                 var result = await _UserManager.ResetPasswordAsync(user, code, Password);
-                if (result.Succeeded)
-                {
-                    _Logger.LogInformation("User password reset.");
-                }
+                if (result.Succeeded) _Logger.LogInformation("User password reset.");
             }
             else
             {
-                string errorMessage = $"Password Reset Error: {System.Environment.NewLine}";
+                var errorMessage = $"Password Reset Error: {Environment.NewLine}";
 
                 throw new Exception(errorMessage);
             }
+
+            return returnvalue;
+        }
+
+        public async Task<string> Logout()
+        {
+            string returnvalue = null;
+            await _SignInManager.SignOutAsync();
+            _Logger.LogInformation("User logged out.");
             return returnvalue;
         }
     }
