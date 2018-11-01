@@ -9,6 +9,7 @@ namespace RiverLinkReporter.api
         {
             services.AddTransient<IUserService, UserService>();
             services.AddSingleton<IEmailService, EmailService>();
+            services.AddTransient<IVehicleService, VehicleService>();
 
             // Add all other services here.
             return services;

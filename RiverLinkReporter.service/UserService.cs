@@ -188,7 +188,6 @@ namespace RiverLinkReporter.Service
             else
             {
                 var errorMessage = $"Password Reset Email Error: {Environment.NewLine}";
-
                 throw new Exception(errorMessage);
             }
 

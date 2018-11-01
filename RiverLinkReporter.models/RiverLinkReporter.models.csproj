@@ -9,4 +9,8 @@
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FileHelpers" Version="3.3.0" />
+  </ItemGroup>
+
 </Project>

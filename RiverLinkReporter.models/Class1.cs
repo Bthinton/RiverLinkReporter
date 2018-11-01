@@ -3,7 +3,8 @@
 namespace RiverLinkReporter.models
 {
     /// <summary>
-    /// hey
+    /// build transponder/transaction service/controllers
+    /// create transponder transponder/transaction/vehicle crud functions
     /// </summary>
     public class Class1
     {
