@@ -9,41 +9,40 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
+using RiverLinkReporter.service;
 using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
-
-
 
 namespace RiverLinkReporter.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VehicleController : ControllerBase
+    public class TransponderController : ControllerBase
     {
         private readonly ApplicationDbContext _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
-        private readonly IVehicleService _VehicleService;
-        private readonly ILogger<VehicleController> _Logger;
+        private readonly ITransponderService _TransponderService;
+        private readonly ILogger<TransponderController> _Logger;
         private readonly UserManager<IdentityUser> _UserManager;
         private readonly IEmailService _emailService;
         private readonly RiverLinkReporter_JWTSettings _TokenOptions;
 
-        public VehicleController(
+        public TransponderController(
             ApplicationDbContext Context,
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
-            IVehicleService VehicleService,
+            ITransponderService TransponderService,
             UserManager<IdentityUser> userManager,
-            ILogger<VehicleController> logger,
+            ILogger<TransponderController> logger,
             IOptions<RiverLinkReporter_JWTSettings> TokenOptions,
-            IEmailService emailService  )
+            IEmailService emailService)
         {
             _Context = Context;
             //_Mapper = Mapper;
-            _VehicleService = VehicleService;
+            _TransponderService = TransponderService;
             _UserManager = userManager;
             _Settings = Settings.Value;
             _Cache = MemoryCache ?? new MemoryCache(new MemoryCacheOptions());
@@ -61,7 +60,7 @@ namespace RiverLinkReporter.api.Controllers
         [Route("api/v1/Vehicles", Name = "GetAll")]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<Vehicle> returnValue = null;
+            IEnumerable<Transponder> returnValue = null;
             //#region Validate Parameters
 
             //if (string.IsNullOrEmpty(Email))
@@ -79,7 +78,7 @@ namespace RiverLinkReporter.api.Controllers
 
             try
             {
-                returnValue = await _VehicleService.GetAll();
+                returnValue = await _TransponderService.GetAll();
             }
             catch (Exception ex)
             {
@@ -99,13 +98,13 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
         [Route("api/v1/Vehicle/Add", Name = "Add")]
-        public async Task<IActionResult> Add(Vehicle vehicle)
+        public async Task<IActionResult> Add(Transponder transponder)
         {
-            Vehicle returnValue = null;
+            Transponder returnValue = null;
 
             try
             {
-                returnValue = await _VehicleService.Add(vehicle);
+                returnValue = await _TransponderService.Add(transponder);
             }
             catch (Exception ex)
             {
@@ -124,14 +123,14 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
-        [Route("api/v1/Vehicle/Delete", Name = "Delete")]
-        public async Task<IActionResult> Delete(Vehicle vehicle)
+        [Route("api/v1/Transponder/Delete", Name = "Delete")]
+        public async Task<IActionResult> Delete(Transponder transponder)
         {
-            Vehicle returnValue = null;
+            Transponder returnValue = null;
 
             try
             {
-                returnValue = await _VehicleService.Delete(vehicle);
+                returnValue = await _TransponderService.Delete(transponder);
             }
             catch (Exception ex)
             {

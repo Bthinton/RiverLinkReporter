@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
 using RiverLinkReporter.service.Data;
+using RiverLinkReporter.Service;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,23 +16,24 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
-namespace RiverLinkReporter.Service
+
+namespace RiverLinkReporter.service
 {
-    public interface IVehicleService
+    public interface ITransponderService
     {
-        Task<IEnumerable<Vehicle>> GetAll();
+        Task<IEnumerable<Transponder>> GetAll();
 
-        Task<Vehicle> Add(Vehicle vehicle);
+        Task<Transponder> Add(Transponder transponder);
 
-        Task<Vehicle> Delete(Vehicle vehicle);
+        Task<Transponder> Delete(Transponder transponder);
     }
 
-    public class VehicleService : IVehicleService
+    public class TransponderService : ITransponderService
     {
         private readonly ApplicationDbContext _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
-        private ILogger<VehicleService> _Logger;
+        private ILogger<TransponderService> _Logger;
         private readonly UserManager<IdentityUser> _UserManager;
         private readonly SignInManager<IdentityUser> _SignInManager;
         private readonly IEmailService _emailService;
@@ -40,14 +42,14 @@ namespace RiverLinkReporter.Service
 
         private ModelStateDictionary _modelState;
 
-        public VehicleService(
+        public TransponderService(
             ApplicationDbContext Context,
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
             UserManager<IdentityUser> UserManager,
             SignInManager<IdentityUser> SignInManager,
-            ILogger<VehicleService> Logger,
+            ILogger<TransponderService> Logger,
             IOptions<RiverLinkReporter_JWTSettings> TokenOptions,
             IEmailService emailService
         )
@@ -63,23 +65,24 @@ namespace RiverLinkReporter.Service
             this._TokenOptions = TokenOptions.Value;
         }
 
-        public async Task<IEnumerable<Vehicle>> GetAll()
+        public async Task<IEnumerable<Transponder>> GetAll()
         {
-            return _Context.Vehicles;
+            return _Context.Transponders;
         }
 
-        public async Task<Vehicle> Add(Vehicle vehicle)
+        public async Task<Transponder> Add(Transponder transponder)
         {
-            _Context.Vehicles.Add(vehicle);
-            await _Context.SaveChangesAsync();         
-            return vehicle;
-        }
-
-        public async Task<Vehicle> Delete(Vehicle vehicle)
-        {
-            _Context.Vehicles.Remove(vehicle);
+            _Context.Transponders.Add(transponder);
             await _Context.SaveChangesAsync();
-            return vehicle;
+            return transponder;
+        }
+
+        public async Task<Transponder> Delete(Transponder transponder)
+        {
+            _Context.Transponders.Remove(transponder);
+            await _Context.SaveChangesAsync();
+            return transponder;
         }
     }
 }
+

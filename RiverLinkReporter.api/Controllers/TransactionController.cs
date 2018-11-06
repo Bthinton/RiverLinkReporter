@@ -9,41 +9,40 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
+using RiverLinkReporter.service;
 using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
-
-
 
 namespace RiverLinkReporter.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VehicleController : ControllerBase
+    public class TransactionController : ControllerBase
     {
         private readonly ApplicationDbContext _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
-        private readonly IVehicleService _VehicleService;
-        private readonly ILogger<VehicleController> _Logger;
+        private readonly ITransactionService _TransactionService;
+        private readonly ILogger<TransactionController> _Logger;
         private readonly UserManager<IdentityUser> _UserManager;
         private readonly IEmailService _emailService;
         private readonly RiverLinkReporter_JWTSettings _TokenOptions;
 
-        public VehicleController(
+        public TransactionController(
             ApplicationDbContext Context,
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
-            IVehicleService VehicleService,
+            ITransactionService TransactionService,
             UserManager<IdentityUser> userManager,
-            ILogger<VehicleController> logger,
+            ILogger<TransactionController> logger,
             IOptions<RiverLinkReporter_JWTSettings> TokenOptions,
-            IEmailService emailService  )
+            IEmailService emailService)
         {
             _Context = Context;
             //_Mapper = Mapper;
-            _VehicleService = VehicleService;
+            _TransactionService = TransactionService;
             _UserManager = userManager;
             _Settings = Settings.Value;
             _Cache = MemoryCache ?? new MemoryCache(new MemoryCacheOptions());
@@ -58,10 +57,10 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "GetAll")]
         [HttpGet]
-        [Route("api/v1/Vehicles", Name = "GetAll")]
+        [Route("api/v1/Transactions", Name = "GetAll")]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<Vehicle> returnValue = null;
+            IEnumerable<Transaction> returnValue = null;
             //#region Validate Parameters
 
             //if (string.IsNullOrEmpty(Email))
@@ -79,7 +78,7 @@ namespace RiverLinkReporter.api.Controllers
 
             try
             {
-                returnValue = await _VehicleService.GetAll();
+                returnValue = await _TransactionService.GetAll();
             }
             catch (Exception ex)
             {
@@ -98,14 +97,14 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
-        [Route("api/v1/Vehicle/Add", Name = "Add")]
-        public async Task<IActionResult> Add(Vehicle vehicle)
+        [Route("api/v1/Transaction/Add", Name = "Add")]
+        public async Task<IActionResult> Add(Transaction transaction)
         {
-            Vehicle returnValue = null;
+            Transaction returnValue = null;
 
             try
             {
-                returnValue = await _VehicleService.Add(vehicle);
+                returnValue = await _TransactionService.Add(transaction);
             }
             catch (Exception ex)
             {
@@ -124,14 +123,14 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
-        [Route("api/v1/Vehicle/Delete", Name = "Delete")]
-        public async Task<IActionResult> Delete(Vehicle vehicle)
+        [Route("api/v1/Transaction/Delete", Name = "Delete")]
+        public async Task<IActionResult> Delete(Transaction transaction)
         {
-            Vehicle returnValue = null;
+            Transaction returnValue = null;
 
             try
             {
-                returnValue = await _VehicleService.Delete(vehicle);
+                returnValue = await _TransactionService.Delete(transaction);
             }
             catch (Exception ex)
             {

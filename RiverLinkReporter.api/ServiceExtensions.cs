@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using RiverLinkReporter.service;
 using RiverLinkReporter.Service;
 
 namespace RiverLinkReporter.api
@@ -10,6 +11,8 @@ namespace RiverLinkReporter.api
             services.AddTransient<IUserService, UserService>();
             services.AddSingleton<IEmailService, EmailService>();
             services.AddTransient<IVehicleService, VehicleService>();
+            services.AddTransient<ITransponderService, TransponderService>();
+            services.AddTransient<ITransactionService, TransactionService>();
 
             // Add all other services here.
             return services;
