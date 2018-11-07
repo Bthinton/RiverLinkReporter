@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
-using RiverLinkReporter.service;
 using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
@@ -38,7 +37,7 @@ namespace RiverLinkReporter.api.Controllers
             UserManager<IdentityUser> userManager,
             ILogger<TransactionController> logger,
             IOptions<RiverLinkReporter_JWTSettings> TokenOptions,
-            IEmailService emailService)
+            IEmailService emailService  )
         {
             _Context = Context;
             //_Mapper = Mapper;
@@ -57,7 +56,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "GetAll")]
         [HttpGet]
-        [Route("api/v1/Transactions", Name = "GetAll")]
+        [Route("api/v1/Transactions", Name = "GetAllTransactions")]
         public async Task<IActionResult> GetAll()
         {
             IEnumerable<Transaction> returnValue = null;
@@ -97,7 +96,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
-        [Route("api/v1/Transaction/Add", Name = "Add")]
+        [Route("api/v1/Transaction/Add", Name = "AddTransaction")]
         public async Task<IActionResult> Add(Transaction transaction)
         {
             Transaction returnValue = null;
@@ -123,14 +122,14 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
-        [Route("api/v1/Transaction/Delete", Name = "Delete")]
-        public async Task<IActionResult> Delete(Transaction transaction)
+        [Route("api/v1/Transaction/Delete", Name = "DeleteTransaction")]
+        public async Task<IActionResult> Delete(int id)
         {
-            Transaction returnValue = null;
+            int returnValue;
 
             try
             {
-                returnValue = await _TransactionService.Delete(transaction);
+                returnValue = await _TransactionService.Delete(id);
             }
             catch (Exception ex)
             {
@@ -140,6 +139,58 @@ namespace RiverLinkReporter.api.Controllers
 
             //return the new certificate
             _Logger.LogInformation($"Delete complete.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "Read")]
+        [HttpGet]
+        [Route("api/v1/Transaction/Read", Name = "ReadTransaction")]
+        public async Task<IActionResult> Read(int id)
+        {
+            Transaction returnValue = null;
+            
+            try
+            {
+                returnValue = _Context.Transactions.Find(id);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Read Unexpected Error: {ex}");
+                return StatusCode(500, $"Read Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"Read complete.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "Update")]
+        [HttpPut]
+        [Route("api/v1/Transaction/Update", Name = "UpdateTransaction")]
+        public async Task<IActionResult> Update(Transaction transaction)
+        {
+            Transaction returnValue = null;
+
+            try
+            {
+                returnValue = await _TransactionService.Update(transaction);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Update Unexpected Error: {ex}");
+                return StatusCode(500, $"Update Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"Update complete.");
             return Ok(returnValue);
         }
     }

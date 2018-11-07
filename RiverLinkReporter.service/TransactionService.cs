@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
 using RiverLinkReporter.service.Data;
-using RiverLinkReporter.Service;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,9 +14,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Remotion.Linq.Clauses;
 
-
-namespace RiverLinkReporter.service
+namespace RiverLinkReporter.Service
 {
     public interface ITransactionService
     {
@@ -25,7 +24,11 @@ namespace RiverLinkReporter.service
 
         Task<Transaction> Add(Transaction transaction);
 
-        Task<Transaction> Delete(Transaction transaction);
+        Task<int> Delete(int id);
+
+        //Task<Transaction> Read(Transaction transaction);
+
+        Task<Transaction> Update(Transaction transaction);
     }
 
     public class TransactionService : ITransactionService
@@ -73,13 +76,26 @@ namespace RiverLinkReporter.service
         public async Task<Transaction> Add(Transaction transaction)
         {
             _Context.Transactions.Add(transaction);
-            await _Context.SaveChangesAsync();
+            await _Context.SaveChangesAsync();         
             return transaction;
         }
 
-        public async Task<Transaction> Delete(Transaction transaction)
+        public async Task<int> Delete(int id)
         {
-            _Context.Transactions.Remove(transaction);
+            _Context.Transactions.Remove(_Context.Transactions.Find(id));
+            await _Context.SaveChangesAsync();
+            return id;
+        }
+
+        //public async Task<int> Read(int id)
+        //{
+        //    Transaction transaction = _Context.Tranactions.Find(id);
+        //    return transaction;
+        //}
+
+        public async Task<Transaction> Update(Transaction transaction)
+        {
+            _Context.Entry(transaction).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             await _Context.SaveChangesAsync();
             return transaction;
         }

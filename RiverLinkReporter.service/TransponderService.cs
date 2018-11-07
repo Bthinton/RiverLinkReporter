@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
 using RiverLinkReporter.service.Data;
-using RiverLinkReporter.Service;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,7 +14,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-
+using Remotion.Linq.Clauses;
+using RiverLinkReporter.Service;
 
 namespace RiverLinkReporter.service
 {
@@ -25,7 +25,11 @@ namespace RiverLinkReporter.service
 
         Task<Transponder> Add(Transponder transponder);
 
-        Task<Transponder> Delete(Transponder transponder);
+        Task<int> Delete(int id);
+
+        //Task<int> Read(int id);
+
+        Task<Transponder> Update(Transponder transponder);
     }
 
     public class TransponderService : ITransponderService
@@ -77,12 +81,24 @@ namespace RiverLinkReporter.service
             return transponder;
         }
 
-        public async Task<Transponder> Delete(Transponder transponder)
+        public async Task<int> Delete(int id)
         {
-            _Context.Transponders.Remove(transponder);
+            _Context.Transponders.Remove(_Context.Transponders.Find(id));
+            await _Context.SaveChangesAsync();
+            return id;
+        }
+
+        //public async Task<int> Read(int id)
+        //{
+        //    Transponder transponder = _Context.Transponders.Find(id);
+        //    return vehicle;
+        //}
+
+        public async Task<Transponder> Update(Transponder transponder)
+        {
+            _Context.Entry(transponder).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             await _Context.SaveChangesAsync();
             return transponder;
         }
     }
 }
-

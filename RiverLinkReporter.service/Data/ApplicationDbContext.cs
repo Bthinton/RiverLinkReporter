@@ -12,7 +12,8 @@ namespace RiverLinkReporter.service.Data
         }
 
         public DbSet<Vehicle> Vehicles { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Transponder> Transponders { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+
     }
 }

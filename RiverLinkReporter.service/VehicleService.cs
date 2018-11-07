@@ -3,17 +3,12 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
 using RiverLinkReporter.service.Data;
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+
 
 namespace RiverLinkReporter.Service
 {
@@ -23,7 +18,11 @@ namespace RiverLinkReporter.Service
 
         Task<Vehicle> Add(Vehicle vehicle);
 
-        Task<Vehicle> Delete(Vehicle vehicle);
+        Task<int> Delete(int id);
+
+        //Task<int> Read(int id);
+
+        Task<Vehicle> Update(Vehicle vehicle);
     }
 
     public class VehicleService : IVehicleService
@@ -75,9 +74,22 @@ namespace RiverLinkReporter.Service
             return vehicle;
         }
 
-        public async Task<Vehicle> Delete(Vehicle vehicle)
+        public async Task<int> Delete(int id)
         {
-            _Context.Vehicles.Remove(vehicle);
+            _Context.Vehicles.Remove(_Context.Vehicles.Find(id));
+            await _Context.SaveChangesAsync();
+            return id;
+        }
+
+        //public async Task<int> Read(int id)
+        //{
+        //    Vehicle vehicle = _Context.Vehicles.Find(id);
+        //    return vehicle;
+        //}
+
+        public async Task<Vehicle> Update(Vehicle vehicle)
+        {
+            _Context.Entry(vehicle).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             await _Context.SaveChangesAsync();
             return vehicle;
         }

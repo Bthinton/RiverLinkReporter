@@ -14,6 +14,8 @@ using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
 
+
+
 namespace RiverLinkReporter.api.Controllers
 {
     [Route("api/[controller]")]
@@ -57,7 +59,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "GetAll")]
         [HttpGet]
-        [Route("api/v1/Vehicles", Name = "GetAll")]
+        [Route("api/v1/Transponders", Name = "GetAllTransponders")]
         public async Task<IActionResult> GetAll()
         {
             IEnumerable<Transponder> returnValue = null;
@@ -97,7 +99,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
-        [Route("api/v1/Vehicle/Add", Name = "Add")]
+        [Route("api/v1/Transponder/Add", Name = "AddTransponder")]
         public async Task<IActionResult> Add(Transponder transponder)
         {
             Transponder returnValue = null;
@@ -123,14 +125,14 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
-        [Route("api/v1/Transponder/Delete", Name = "Delete")]
-        public async Task<IActionResult> Delete(Transponder transponder)
+        [Route("api/v1/Transponder/Delete", Name = "DeleteTransponder")]
+        public async Task<IActionResult> Delete(int id)
         {
-            Transponder returnValue = null;
+            int returnValue;
 
             try
             {
-                returnValue = await _TransponderService.Delete(transponder);
+                returnValue = await _TransponderService.Delete(id);
             }
             catch (Exception ex)
             {
@@ -140,6 +142,58 @@ namespace RiverLinkReporter.api.Controllers
 
             //return the new certificate
             _Logger.LogInformation($"Delete complete.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "Read")]
+        [HttpGet]
+        [Route("api/v1/Transponder/Read", Name = "ReadTransponder")]
+        public async Task<IActionResult> Read(int id)
+        {
+            Transponder returnValue = null;
+
+            try
+            {
+                returnValue = _Context.Transponders.Find(id);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Read Unexpected Error: {ex}");
+                return StatusCode(500, $"Read Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"Read complete.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "Update")]
+        [HttpPut]
+        [Route("api/v1/Transponder/Update", Name = "UpdateTransponder")]
+        public async Task<IActionResult> Update(Transponder transponder)
+        {
+            Transponder returnValue = null;
+
+            try
+            {
+                returnValue = await _TransponderService.Update(transponder);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Update Unexpected Error: {ex}");
+                return StatusCode(500, $"Update Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"Update complete.");
             return Ok(returnValue);
         }
     }

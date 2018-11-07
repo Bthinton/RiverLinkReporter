@@ -13,8 +13,6 @@ using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
 
-
-
 namespace RiverLinkReporter.api.Controllers
 {
     [Route("api/[controller]")]
@@ -58,7 +56,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "GetAll")]
         [HttpGet]
-        [Route("api/v1/Vehicles", Name = "GetAll")]
+        [Route("api/v1/Vehicles", Name = "GetAllVehicles")]
         public async Task<IActionResult> GetAll()
         {
             IEnumerable<Vehicle> returnValue = null;
@@ -98,7 +96,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
-        [Route("api/v1/Vehicle/Add", Name = "Add")]
+        [Route("api/v1/Vehicle/Add", Name = "AddVehicle")]
         public async Task<IActionResult> Add(Vehicle vehicle)
         {
             Vehicle returnValue = null;
@@ -124,14 +122,14 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
-        [Route("api/v1/Vehicle/Delete", Name = "Delete")]
-        public async Task<IActionResult> Delete(Vehicle vehicle)
+        [Route("api/v1/Vehicle/Delete", Name = "DeleteVehicle")]
+        public async Task<IActionResult> Delete(int id)
         {
-            Vehicle returnValue = null;
+            int returnValue;
 
             try
             {
-                returnValue = await _VehicleService.Delete(vehicle);
+                returnValue = await _VehicleService.Delete(id);
             }
             catch (Exception ex)
             {
@@ -141,6 +139,58 @@ namespace RiverLinkReporter.api.Controllers
 
             //return the new certificate
             _Logger.LogInformation($"Delete complete.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "Read")]
+        [HttpGet]
+        [Route("api/v1/Vehicle/Read", Name = "ReadVehicle")]
+        public async Task<IActionResult> Read(int id)
+        {
+            Vehicle returnValue = null;
+
+            try
+            {
+                returnValue = _Context.Vehicles.Find(id);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Read Unexpected Error: {ex}");
+                return StatusCode(500, $"Read Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"Read complete.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "Update")]
+        [HttpPut]
+        [Route("api/v1/Vehicle/Update", Name = "UpdateVehicle")]
+        public async Task<IActionResult> Update(Vehicle vehicle)
+        {
+            Vehicle returnValue = null;
+
+            try
+            {
+                returnValue = await _VehicleService.Update(vehicle);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"Update Unexpected Error: {ex}");
+                return StatusCode(500, $"Update Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"Update complete.");
             return Ok(returnValue);
         }
     }
