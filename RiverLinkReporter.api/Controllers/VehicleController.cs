@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -9,10 +6,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
-using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
- 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+
 //TODO Fix all controllers to use EFRepository
 //Add userId to all of appropriate models(not flatfiles)
 //Work queue
@@ -24,7 +25,7 @@ namespace RiverLinkReporter.api.Controllers
     [ApiController]
     public class VehicleController : ControllerBase
     {
-        private readonly ApplicationDbContext _Context;
+        private readonly IRepository _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
         private readonly IVehicleService _VehicleService;
@@ -34,7 +35,7 @@ namespace RiverLinkReporter.api.Controllers
         private readonly RiverLinkReporter_JWTSettings _TokenOptions;
 
         public VehicleController(
-            ApplicationDbContext Context,
+            IRepository Context,
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
@@ -62,7 +63,7 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "GetAll")]
         [HttpGet]
         [Route("api/v1/Vehicles", Name = "GetAllVehicles")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllVehicles()
         {
             IEnumerable<Vehicle> returnValue = null;
             //#region Validate Parameters
@@ -82,16 +83,16 @@ namespace RiverLinkReporter.api.Controllers
 
             try
             {
-                returnValue = await _VehicleService.GetAll();
+                returnValue = _Context.GetAll<Vehicle>();
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"GetAll Unexpected Error: {ex}");
-                return StatusCode(500, $"GetAll Unexpected Error: {ex}");
+                _Logger.LogError($"GetAllVehicles Unexpected Error: {ex}");
+                return StatusCode(500, $"GetAllVehicles Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Register complete.");
+            _Logger.LogInformation($"GetAllVehicles complete.");
             return Ok(returnValue);
         }
 
@@ -102,22 +103,23 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
         [Route("api/v1/Vehicle", Name = "AddVehicle")]
-        public async Task<IActionResult> Add(Vehicle vehicle)
+        public async Task<IActionResult> AddVehicle(Vehicle vehicle)
         {
-            Vehicle returnValue = null;
+            Vehicle returnValue = vehicle;
 
             try
             {
-                returnValue = await _VehicleService.Add(vehicle);
+                _Context.Create(vehicle);
+                _Context.SaveAsync();
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"Add Unexpected Error: {ex}");
-                return StatusCode(500, $"Add Unexpected Error: {ex}");
+                _Logger.LogError($"AddVehicle Unexpected Error: {ex}");
+                return StatusCode(500, $"AddVehicle Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Add complete.");
+            _Logger.LogInformation($"AddVehicle complete.");
             return Ok(returnValue);
         }
 
@@ -125,7 +127,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(typeof(IdentityResult), 200)]
         [ProducesResponseType(typeof(BadRequestResult), 400)]
         [ProducesResponseType(500)]
-        [SwaggerOperation(OperationId = "Delete")]
+        [SwaggerOperation(OperationId = "DeleteById")]
         [HttpDelete]
         [Route("api/v1/Vehicle/{id}", Name = "DeleteVehicleById")]
         public async Task<IActionResult> DeleteVehicleById(int id)
@@ -134,16 +136,18 @@ namespace RiverLinkReporter.api.Controllers
 
             try
             {
-                returnValue = await _VehicleService.Delete(id);
+                _Context.Delete<Vehicle>(id);
+                _Context.SaveAsync();
+                returnValue = id;
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"Delete Unexpected Error: {ex}");
-                return StatusCode(500, $"Delete Unexpected Error: {ex}");
+                _Logger.LogError($"DeleteVehicleById Unexpected Error: {ex}");
+                return StatusCode(500, $"DeleteVehicleById Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Delete complete.");
+            _Logger.LogInformation($"DeleteVehicleById complete.");
             return Ok(returnValue);
         }
 
@@ -154,22 +158,22 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "GetById")]
         [HttpGet]
         [Route("api/v1/Vehicle/{id}", Name = "GetVehicleById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetVehicleById(int id)
         {
             Vehicle returnValue = null;
 
             try
             {
-                returnValue = await _VehicleService.Read(id);
+                returnValue = _Context.GetById<Vehicle>(id);               
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"Read Unexpected Error: {ex}");
-                return StatusCode(500, $"Read Unexpected Error: {ex}");
+                _Logger.LogError($"GetVehicleById Unexpected Error: {ex}");
+                return StatusCode(500, $"GetVehicleById Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Read complete.");
+            _Logger.LogInformation($"GetVehicleById complete.");
             return Ok(returnValue);
         }
 
@@ -180,23 +184,98 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "Update")]
         [HttpPut]
         [Route("api/v1/Vehicle", Name = "UpdateVehicle")]
-        public async Task<IActionResult> Update(Vehicle vehicle)
+        public async Task<IActionResult> UpdateVehicle(Vehicle vehicle)
         {
             Vehicle returnValue = null;
 
             try
             {
-                returnValue = await _VehicleService.Update(vehicle);
+                _Context.Update(vehicle);
+                _Context.SaveAsync();
+                returnValue = vehicle;
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"Update Unexpected Error: {ex}");
-                return StatusCode(500, $"Update Unexpected Error: {ex}");
+                _Logger.LogError($"UpdateVehicle Unexpected Error: {ex}");
+                return StatusCode(500, $"UpdateVehicle Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Update complete.");
+            _Logger.LogInformation($"UpdateVehicle complete.");
             return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "MarkDeleted")]
+        [HttpPatch]
+        [Route("api/v1/Vehicle", Name = "MarkVehicleDeleted")]
+        public async Task<IActionResult> MarkVehicleDeleted(int id)
+        {
+            int returnValue;
+
+            try
+            {
+                _Context.MarkDeleted<Vehicle>(id);
+                _Context.SaveAsync();
+                returnValue = id;
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"MarkVehicleDeleted Unexpected Error: {ex}");
+                return StatusCode(500, $"MarkVehicleDeleted Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"MarkVehicleDeleted complete.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "GetAllByUserId")]
+        [HttpGet]
+        [Route("api/v1/Vehicles/{userId}", Name = "GetAllVehiclesByUserId")]
+        public async Task<IActionResult> GetAllVehiclesByUserId(Guid userId)
+        {
+            IEnumerable<Vehicle> returnValue = null;
+            //#region Validate Parameters
+
+            //if (string.IsNullOrEmpty(Email))
+            //    ModelState.AddModelError($"Register Error", $"The {nameof(Email)} cannot be zero");
+
+            //if (!ModelState.IsValid)
+            //{
+            //    LogInvalidState();
+            //    return BadRequest(ModelState);
+            //}
+
+            //_Logger.LogDebug($"ModelState is valid.");
+
+            //#endregion Validate Parameters
+
+            try
+            {
+                returnValue = _Context.Get<Vehicle>(FilterByUserId(userId), orderBy: q => q.OrderBy(x => x.Transponder));
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"GetAllVehiclesByUserId Unexpected Error: {ex}");
+                return StatusCode(500, $"GetAllVehiclesByUserId Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"GetAllVehiclesByUserId complete.");
+            return Ok(returnValue);
+        }
+
+        public static Expression<Func<Vehicle, bool>> FilterByUserId(Guid userId)
+        {
+            return x => x.UserId == userId;
         }
     }
 }

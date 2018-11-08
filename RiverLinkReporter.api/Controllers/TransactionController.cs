@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -9,9 +6,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
-using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RiverLinkReporter.api.Controllers
 {
@@ -19,7 +19,7 @@ namespace RiverLinkReporter.api.Controllers
     [ApiController]
     public class TransactionController : ControllerBase
     {
-        private readonly ApplicationDbContext _Context;
+        private readonly IRepository _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
         private readonly ITransactionService _TransactionService;
@@ -29,7 +29,7 @@ namespace RiverLinkReporter.api.Controllers
         private readonly RiverLinkReporter_JWTSettings _TokenOptions;
 
         public TransactionController(
-            ApplicationDbContext Context,
+            IRepository Context,
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
@@ -57,7 +57,7 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "GetAll")]
         [HttpGet]
         [Route("api/v1/Transactions", Name = "GetAllTransactions")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllTransactions()
         {
             IEnumerable<Transaction> returnValue = null;
             //#region Validate Parameters
@@ -77,16 +77,16 @@ namespace RiverLinkReporter.api.Controllers
 
             try
             {
-                returnValue = await _TransactionService.GetAll();
+                returnValue = _Context.GetAll<Transaction>();
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"GetAll Unexpected Error: {ex}");
-                return StatusCode(500, $"GetAll Unexpected Error: {ex}");
+                _Logger.LogError($"GetAllTransactions Unexpected Error: {ex}");
+                return StatusCode(500, $"GetAllTransactions Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Register complete.");
+            _Logger.LogInformation($"GetAllTransactions complete.");
             return Ok(returnValue);
         }
 
@@ -97,22 +97,23 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
         [Route("api/v1/Transaction", Name = "AddTransaction")]
-        public async Task<IActionResult> Add(Transaction transaction)
+        public async Task<IActionResult> AddTransaction(Transaction transaction)
         {
-            Transaction returnValue = null;
+            Transaction returnValue = transaction;
 
             try
             {
-                returnValue = await _TransactionService.Add(transaction);
+                _Context.Create(transaction);
+                _Context.SaveAsync();
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"Add Unexpected Error: {ex}");
-                return StatusCode(500, $"Add Unexpected Error: {ex}");
+                _Logger.LogError($"AddTransaction Unexpected Error: {ex}");
+                return StatusCode(500, $"AddTransaction Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Add complete.");
+            _Logger.LogInformation($"AddTransaction complete.");
             return Ok(returnValue);
         }
 
@@ -123,22 +124,23 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
         [Route("api/v1/Transaction/{id}", Name = "DeleteTransaction")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteTransaction(int id)
         {
-            int returnValue;
+            int returnValue = id;
 
             try
             {
-                returnValue = await _TransactionService.Delete(id);
+                _Context.Delete<Transaction>(id);
+                _Context.SaveAsync();
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"Delete Unexpected Error: {ex}");
-                return StatusCode(500, $"Delete Unexpected Error: {ex}");
+                _Logger.LogError($"DeleteTransaction Unexpected Error: {ex}");
+                return StatusCode(500, $"DeleteTransaction Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Delete complete.");
+            _Logger.LogInformation($"DeleteTransaction complete.");
             return Ok(returnValue);
         }
 
@@ -155,16 +157,16 @@ namespace RiverLinkReporter.api.Controllers
             
             try
             {
-                returnValue = _Context.Transactions.Find(id);
+                returnValue = _Context.GetById<Transaction>(id);
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"Read Unexpected Error: {ex}");
-                return StatusCode(500, $"Read Unexpected Error: {ex}");
+                _Logger.LogError($"GetTransactionById Unexpected Error: {ex}");
+                return StatusCode(500, $"GetTransactionById Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Read complete.");
+            _Logger.LogInformation($"GetTransactionById complete.");
             return Ok(returnValue);
         }
 
@@ -175,22 +177,63 @@ namespace RiverLinkReporter.api.Controllers
         [SwaggerOperation(OperationId = "Update")]
         [HttpPut]
         [Route("api/v1/Transaction", Name = "UpdateTransaction")]
-        public async Task<IActionResult> Update(Transaction transaction)
+        public async Task<IActionResult> UpdateTransaction(Transaction transaction)
         {
-            Transaction returnValue = null;
+            Transaction returnValue = transaction;
 
             try
             {
-                returnValue = await _TransactionService.Update(transaction);
+                _Context.Update(transaction);
+                _Context.SaveAsync();
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"Update Unexpected Error: {ex}");
-                return StatusCode(500, $"Update Unexpected Error: {ex}");
+                _Logger.LogError($"UpdateTransaction Unexpected Error: {ex}");
+                return StatusCode(500, $"UpdateTransaction Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"Update complete.");
+            _Logger.LogInformation($"UpdateTransaction complete.");
+            return Ok(returnValue);
+        }
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IdentityResult), 200)]
+        [ProducesResponseType(typeof(BadRequestResult), 400)]
+        [ProducesResponseType(500)]
+        [SwaggerOperation(OperationId = "GetAllByUserId")]
+        [HttpGet]
+        [Route("api/v1/Vehicles/{userId}", Name = "GetAllVehiclesByUserId")]
+        public async Task<IActionResult> GetAllVehiclesByUserId(Guid userId)
+        {
+            IEnumerable<Vehicle> returnValue = null;
+            //#region Validate Parameters
+
+            //if (string.IsNullOrEmpty(Email))
+            //    ModelState.AddModelError($"Register Error", $"The {nameof(Email)} cannot be zero");
+
+            //if (!ModelState.IsValid)
+            //{
+            //    LogInvalidState();
+            //    return BadRequest(ModelState);
+            //}
+
+            //_Logger.LogDebug($"ModelState is valid.");
+
+            //#endregion Validate Parameters
+
+            try
+            {
+                returnValue = _Context.Get<Vehicle>(VehicleController.FilterByUserId(userId), orderBy: q => q.OrderBy(x => x.Transponder));
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError($"GetAllVehiclesByUserId Unexpected Error: {ex}");
+                return StatusCode(500, $"GetAllVehiclesByUserId Unexpected Error: {ex}");
+            }
+
+            //return the new certificate
+            _Logger.LogInformation($"GetAllVehiclesByUserId complete.");
             return Ok(returnValue);
         }
     }

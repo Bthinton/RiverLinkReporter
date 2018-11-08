@@ -74,28 +74,26 @@ namespace RiverLinkReporter.Service
 
         public async Task<Vehicle> Add(Vehicle vehicle)
         {
-            _Context.Vehicles.Add(vehicle);
-            await _Context.SaveChangesAsync();         
+            _Context.Create(vehicle);
+            _Context.SaveAsync();
             return vehicle;
         }
 
         public async Task<int> Delete(int id)
         {
-            _Context.Vehicles.Remove(_Context.Vehicles.Find(id));
-            await _Context.SaveChangesAsync();
+            _Context.Delete<Vehicle>(id);
             return id;
         }
 
         public async Task<Vehicle> Read(int id)
         {
-            Vehicle vehicle = _Context.Vehicles.Find(id);
+            Vehicle vehicle = _Context.GetById<Vehicle>(id);
             return vehicle;
         }
 
         public async Task<Vehicle> Update(Vehicle vehicle)
         {
-            _Context.Entry(vehicle).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            await _Context.SaveChangesAsync();
+            _Context.Update(vehicle);
             return vehicle;
         }
 
