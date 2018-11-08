@@ -54,5 +54,7 @@ namespace RiverLinkReport.Models
         public string Transponder { get; set; }
 
         public string TransponderType { get; set; }
+
+        public bool Deleted { get; set; }
     }
 }

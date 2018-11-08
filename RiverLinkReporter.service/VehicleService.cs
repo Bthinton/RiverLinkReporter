@@ -6,7 +6,10 @@ using Microsoft.Extensions.Options;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
 using RiverLinkReporter.service.Data;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 
@@ -20,14 +23,16 @@ namespace RiverLinkReporter.Service
 
         Task<int> Delete(int id);
 
-        //Task<int> Read(int id);
+        Task<Vehicle> Read(int id);
 
         Task<Vehicle> Update(Vehicle vehicle);
+
+        Task MarkDeleted(int id);
     }
 
     public class VehicleService : IVehicleService
     {
-        private readonly ApplicationDbContext _Context;
+        private readonly IRepository _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
         private ILogger<VehicleService> _Logger;
@@ -40,7 +45,7 @@ namespace RiverLinkReporter.Service
         private ModelStateDictionary _modelState;
 
         public VehicleService(
-            ApplicationDbContext Context,
+            IRepository Context,
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
@@ -64,7 +69,7 @@ namespace RiverLinkReporter.Service
 
         public async Task<IEnumerable<Vehicle>> GetAll()
         {
-            return _Context.Vehicles;
+            return _Context.GetAll<Vehicle>();
         }
 
         public async Task<Vehicle> Add(Vehicle vehicle)
@@ -81,11 +86,11 @@ namespace RiverLinkReporter.Service
             return id;
         }
 
-        //public async Task<int> Read(int id)
-        //{
-        //    Vehicle vehicle = _Context.Vehicles.Find(id);
-        //    return vehicle;
-        //}
+        public async Task<Vehicle> Read(int id)
+        {
+            Vehicle vehicle = _Context.Vehicles.Find(id);
+            return vehicle;
+        }
 
         public async Task<Vehicle> Update(Vehicle vehicle)
         {
@@ -93,5 +98,20 @@ namespace RiverLinkReporter.Service
             await _Context.SaveChangesAsync();
             return vehicle;
         }
+
+        public async Task MarkDeleted(int id)
+        {
+            _Context.MarkDeleted<Vehicle>(id);
+        }
+
+        public async Task<IEnumerable<Vehicle>> GetAllByUserId(System.Guid userId)
+        {            
+            return _Context.Get<Vehicle>(FilterByUserId(userId), orderBy: query => query.OrderBy(x => x.Transponder));
+        }
+
+        Expression<Func<Vehicle, bool>> FilterByUserId(System.Guid userId)
+        {
+            return x => x.UserId == userId;
+        }      
     }
 }

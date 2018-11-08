@@ -96,7 +96,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
-        [Route("api/v1/Transaction/Add", Name = "AddTransaction")]
+        [Route("api/v1/Transaction", Name = "AddTransaction")]
         public async Task<IActionResult> Add(Transaction transaction)
         {
             Transaction returnValue = null;
@@ -122,7 +122,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
-        [Route("api/v1/Transaction/Delete", Name = "DeleteTransaction")]
+        [Route("api/v1/Transaction/{id}", Name = "DeleteTransaction")]
         public async Task<IActionResult> Delete(int id)
         {
             int returnValue;
@@ -148,8 +148,8 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Read")]
         [HttpGet]
-        [Route("api/v1/Transaction/Read", Name = "ReadTransaction")]
-        public async Task<IActionResult> Read(int id)
+        [Route("api/v1/Transaction/{id}", Name = "GetTransactionById")]
+        public async Task<IActionResult> GetTransactionById(int id)
         {
             Transaction returnValue = null;
             
@@ -174,7 +174,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Update")]
         [HttpPut]
-        [Route("api/v1/Transaction/Update", Name = "UpdateTransaction")]
+        [Route("api/v1/Transaction", Name = "UpdateTransaction")]
         public async Task<IActionResult> Update(Transaction transaction)
         {
             Transaction returnValue = null;

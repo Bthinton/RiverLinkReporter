@@ -12,6 +12,11 @@ using RiverLinkReporter.models;
 using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
+ 
+//TODO Fix all controllers to use EFRepository
+//Add userId to all of appropriate models(not flatfiles)
+//Work queue
+//Create azure account
 
 namespace RiverLinkReporter.api.Controllers
 {
@@ -96,7 +101,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
-        [Route("api/v1/Vehicle/Add", Name = "AddVehicle")]
+        [Route("api/v1/Vehicle", Name = "AddVehicle")]
         public async Task<IActionResult> Add(Vehicle vehicle)
         {
             Vehicle returnValue = null;
@@ -122,8 +127,8 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
-        [Route("api/v1/Vehicle/Delete", Name = "DeleteVehicle")]
-        public async Task<IActionResult> Delete(int id)
+        [Route("api/v1/Vehicle/{id}", Name = "DeleteVehicleById")]
+        public async Task<IActionResult> DeleteVehicleById(int id)
         {
             int returnValue;
 
@@ -146,16 +151,16 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(typeof(IdentityResult), 200)]
         [ProducesResponseType(typeof(BadRequestResult), 400)]
         [ProducesResponseType(500)]
-        [SwaggerOperation(OperationId = "Read")]
+        [SwaggerOperation(OperationId = "GetById")]
         [HttpGet]
-        [Route("api/v1/Vehicle/Read", Name = "ReadVehicle")]
-        public async Task<IActionResult> Read(int id)
+        [Route("api/v1/Vehicle/{id}", Name = "GetVehicleById")]
+        public async Task<IActionResult> GetById(int id)
         {
             Vehicle returnValue = null;
 
             try
             {
-                returnValue = _Context.Vehicles.Find(id);
+                returnValue = await _VehicleService.Read(id);
             }
             catch (Exception ex)
             {
@@ -174,7 +179,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Update")]
         [HttpPut]
-        [Route("api/v1/Vehicle/Update", Name = "UpdateVehicle")]
+        [Route("api/v1/Vehicle", Name = "UpdateVehicle")]
         public async Task<IActionResult> Update(Vehicle vehicle)
         {
             Vehicle returnValue = null;

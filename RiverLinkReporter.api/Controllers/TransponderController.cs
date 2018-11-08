@@ -99,7 +99,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Add")]
         [HttpPost]
-        [Route("api/v1/Transponder/Add", Name = "AddTransponder")]
+        [Route("api/v1/Transponder", Name = "AddTransponder")]
         public async Task<IActionResult> Add(Transponder transponder)
         {
             Transponder returnValue = null;
@@ -125,7 +125,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Delete")]
         [HttpDelete]
-        [Route("api/v1/Transponder/Delete", Name = "DeleteTransponder")]
+        [Route("api/v1/Transponder/{id}", Name = "DeleteTransponderById")]
         public async Task<IActionResult> Delete(int id)
         {
             int returnValue;
@@ -151,8 +151,8 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Read")]
         [HttpGet]
-        [Route("api/v1/Transponder/Read", Name = "ReadTransponder")]
-        public async Task<IActionResult> Read(int id)
+        [Route("api/v1/Transponder/{id}", Name = "GetTransponderById")]
+        public async Task<IActionResult> GetTransponderById(int id)
         {
             Transponder returnValue = null;
 
@@ -177,7 +177,7 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "Update")]
         [HttpPut]
-        [Route("api/v1/Transponder/Update", Name = "UpdateTransponder")]
+        [Route("api/v1/Transponder", Name = "UpdateTransponder")]
         public async Task<IActionResult> Update(Transponder transponder)
         {
             Transponder returnValue = null;
