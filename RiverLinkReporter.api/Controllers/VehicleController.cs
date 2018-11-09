@@ -28,7 +28,6 @@ namespace RiverLinkReporter.api.Controllers
         private readonly IRepository _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
-        private readonly IVehicleService _VehicleService;
         private readonly ILogger<VehicleController> _Logger;
         private readonly UserManager<IdentityUser> _UserManager;
         private readonly IEmailService _emailService;
@@ -39,7 +38,6 @@ namespace RiverLinkReporter.api.Controllers
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
-            IVehicleService VehicleService,
             UserManager<IdentityUser> userManager,
             ILogger<VehicleController> logger,
             IOptions<RiverLinkReporter_JWTSettings> TokenOptions,
@@ -47,7 +45,6 @@ namespace RiverLinkReporter.api.Controllers
         {
             _Context = Context;
             //_Mapper = Mapper;
-            _VehicleService = VehicleService;
             _UserManager = userManager;
             _Settings = Settings.Value;
             _Cache = MemoryCache ?? new MemoryCache(new MemoryCacheOptions());

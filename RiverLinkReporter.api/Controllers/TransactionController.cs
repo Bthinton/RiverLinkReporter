@@ -11,6 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace RiverLinkReporter.api.Controllers
@@ -22,7 +23,6 @@ namespace RiverLinkReporter.api.Controllers
         private readonly IRepository _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
-        private readonly ITransactionService _TransactionService;
         private readonly ILogger<TransactionController> _Logger;
         private readonly UserManager<IdentityUser> _UserManager;
         private readonly IEmailService _emailService;
@@ -33,7 +33,6 @@ namespace RiverLinkReporter.api.Controllers
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
-            ITransactionService TransactionService,
             UserManager<IdentityUser> userManager,
             ILogger<TransactionController> logger,
             IOptions<RiverLinkReporter_JWTSettings> TokenOptions,
@@ -41,7 +40,6 @@ namespace RiverLinkReporter.api.Controllers
         {
             _Context = Context;
             //_Mapper = Mapper;
-            _TransactionService = TransactionService;
             _UserManager = userManager;
             _Settings = Settings.Value;
             _Cache = MemoryCache ?? new MemoryCache(new MemoryCacheOptions());
@@ -201,12 +199,12 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(typeof(IdentityResult), 200)]
         [ProducesResponseType(typeof(BadRequestResult), 400)]
         [ProducesResponseType(500)]
-        [SwaggerOperation(OperationId = "GetAllByUserId")]
+        [SwaggerOperation(OperationId = "GetAllTransactionsByUserId")]
         [HttpGet]
-        [Route("api/v1/Vehicles/{userId}", Name = "GetAllVehiclesByUserId")]
-        public async Task<IActionResult> GetAllVehiclesByUserId(Guid userId)
+        [Route("api/v1/Transactions/{userId}", Name = "GetAllTransactionsByUserId")]
+        public async Task<IActionResult> GetAllTransactionsByUserId(Guid userId)
         {
-            IEnumerable<Vehicle> returnValue = null;
+            IEnumerable<Transaction> returnValue = null;
             //#region Validate Parameters
 
             //if (string.IsNullOrEmpty(Email))
@@ -224,17 +222,22 @@ namespace RiverLinkReporter.api.Controllers
 
             try
             {
-                returnValue = _Context.Get<Vehicle>(VehicleController.FilterByUserId(userId), orderBy: q => q.OrderBy(x => x.Transponder));
+                returnValue = _Context.Get<Transaction>(FilterByUserId(userId), orderBy: q => q.OrderBy(x => x.Transponder));
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"GetAllVehiclesByUserId Unexpected Error: {ex}");
-                return StatusCode(500, $"GetAllVehiclesByUserId Unexpected Error: {ex}");
+                _Logger.LogError($"GetAllTransactionsByUserId Unexpected Error: {ex}");
+                return StatusCode(500, $"GetAllTransactionsByUserId Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"GetAllVehiclesByUserId complete.");
+            _Logger.LogInformation($"GetAllTransactionsByUserId complete.");
             return Ok(returnValue);
+        }
+
+        public static Expression<Func<Transaction, bool>> FilterByUserId(Guid userId)
+        {
+            return x => x.UserId == userId;
         }
     }
 }

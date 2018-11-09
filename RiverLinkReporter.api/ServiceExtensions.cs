@@ -11,9 +11,6 @@ namespace RiverLinkReporter.api
         {
             services.AddTransient<IUserService, UserService>();
             services.AddSingleton<IEmailService, EmailService>();
-            services.AddTransient<IVehicleService, VehicleService>();
-            services.AddTransient<ITransponderService, TransponderService>();
-            services.AddTransient<ITransactionService, TransactionService>();
             services.AddTransient<IRepository, EFRepository<ApplicationDbContext>>();
 
             // Add all other services here.

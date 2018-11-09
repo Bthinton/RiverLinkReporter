@@ -12,6 +12,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 
@@ -25,7 +26,6 @@ namespace RiverLinkReporter.api.Controllers
         private readonly IRepository _Context;
         private readonly RiverLinkReporterSettings _Settings;
         private readonly IMemoryCache _Cache;
-        private readonly ITransponderService _TransponderService;
         private readonly ILogger<TransponderController> _Logger;
         private readonly UserManager<IdentityUser> _UserManager;
         private readonly IEmailService _emailService;
@@ -36,7 +36,6 @@ namespace RiverLinkReporter.api.Controllers
             //IMapper Mapper,
             IOptions<RiverLinkReporterSettings> Settings,
             IMemoryCache MemoryCache,
-            ITransponderService TransponderService,
             UserManager<IdentityUser> userManager,
             ILogger<TransponderController> logger,
             IOptions<RiverLinkReporter_JWTSettings> TokenOptions,
@@ -44,7 +43,6 @@ namespace RiverLinkReporter.api.Controllers
         {
             _Context = Context;
             //_Mapper = Mapper;
-            _TransponderService = TransponderService;
             _UserManager = userManager;
             _Settings = Settings.Value;
             _Cache = MemoryCache ?? new MemoryCache(new MemoryCacheOptions());
@@ -206,10 +204,10 @@ namespace RiverLinkReporter.api.Controllers
         [ProducesResponseType(500)]
         [SwaggerOperation(OperationId = "GetAllByUserId")]
         [HttpGet]
-        [Route("api/v1/Vehicles/{userId}", Name = "GetAllVehiclesByUserId")]
-        public async Task<IActionResult> GetAllVehiclesByUserId(Guid userId)
+        [Route("api/v1/Transponders/{userId}", Name = "GetAllTranspondersByUserId")]
+        public async Task<IActionResult> GetAllTranspondersByUserId(Guid userId)
         {
-            IEnumerable<Vehicle> returnValue = null;
+            IEnumerable<Transponder> returnValue = null;
             //#region Validate Parameters
 
             //if (string.IsNullOrEmpty(Email))
@@ -227,17 +225,22 @@ namespace RiverLinkReporter.api.Controllers
 
             try
             {
-                returnValue = _Context.Get<Vehicle>(VehicleController.FilterByUserId(userId), orderBy: q => q.OrderBy(x => x.Transponder));
+                returnValue = _Context.Get<Transponder>(FilterByUserId(userId), orderBy: q => q.OrderBy(x => x.TransponderNumber));
             }
             catch (Exception ex)
             {
-                _Logger.LogError($"GetAllVehiclesByUserId Unexpected Error: {ex}");
-                return StatusCode(500, $"GetAllVehiclesByUserId Unexpected Error: {ex}");
+                _Logger.LogError($"GetAllTranspondersByUserId Unexpected Error: {ex}");
+                return StatusCode(500, $"GetAllTranspondersByUserId Unexpected Error: {ex}");
             }
 
             //return the new certificate
-            _Logger.LogInformation($"GetAllVehiclesByUserId complete.");
+            _Logger.LogInformation($"GetAllTranspondersByUserId complete.");
             return Ok(returnValue);
+        }
+
+        public static Expression<Func<Transponder, bool>> FilterByUserId(Guid userId)
+        {
+            return x => x.UserId == userId;
         }
     }
 }
