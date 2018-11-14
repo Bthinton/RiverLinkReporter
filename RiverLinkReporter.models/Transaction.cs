@@ -1,6 +1,5 @@
 ﻿using FileHelpers;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 //Sort same as transaction file

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RiverLinkReport.Models;
 using RiverLinkReporter.models;
-using RiverLinkReporter.service;
 using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
 using System;

@@ -14,10 +14,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-//TODO Fix all controllers to use EFRepository
-//Add userId to all of appropriate models(not flatfiles)
-//Work queue
-//Create azure account
+//TODO Work queue
 
 namespace RiverLinkReporter.api.Controllers
 {
@@ -63,20 +60,6 @@ namespace RiverLinkReporter.api.Controllers
         public async Task<IActionResult> GetAllVehicles()
         {
             IEnumerable<Vehicle> returnValue = null;
-            //#region Validate Parameters
-
-            //if (string.IsNullOrEmpty(Email))
-            //    ModelState.AddModelError($"Register Error", $"The {nameof(Email)} cannot be zero");
-
-            //if (!ModelState.IsValid)
-            //{
-            //    LogInvalidState();
-            //    return BadRequest(ModelState);
-            //}
-
-            //_Logger.LogDebug($"ModelState is valid.");
-
-            //#endregion Validate Parameters
 
             try
             {
@@ -240,20 +223,6 @@ namespace RiverLinkReporter.api.Controllers
         public async Task<IActionResult> GetAllVehiclesByUserId(Guid userId)
         {
             IEnumerable<Vehicle> returnValue = null;
-            //#region Validate Parameters
-
-            //if (string.IsNullOrEmpty(Email))
-            //    ModelState.AddModelError($"Register Error", $"The {nameof(Email)} cannot be zero");
-
-            //if (!ModelState.IsValid)
-            //{
-            //    LogInvalidState();
-            //    return BadRequest(ModelState);
-            //}
-
-            //_Logger.LogDebug($"ModelState is valid.");
-
-            //#endregion Validate Parameters
 
             try
             {

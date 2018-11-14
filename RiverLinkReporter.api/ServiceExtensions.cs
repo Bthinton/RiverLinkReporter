@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RiverLinkReporter.service;
 using RiverLinkReporter.service.Data;
 using RiverLinkReporter.Service;
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RiverLinkReporter.models
+﻿namespace RiverLinkReporter.models
 {
     public interface IRiverLinkReporter_JWTSettings
     {
