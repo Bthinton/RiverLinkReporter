@@ -1,8 +1,13 @@
 ﻿using System;
 
+
+//Bring over automation and CLI over to this project(services replaces BAL)
+//for automation choose latest .NET standard libraries if possible(check compatibility)
+//Decide on used entity or stored procedure for queue sql update
+
 namespace RiverLinkReporter.models
 {
-    public enum WorkQueueType
+    public enum WorkQueueTypes
     {
         TestPassword,
         GetData
@@ -19,5 +24,7 @@ namespace RiverLinkReporter.models
         public DateTime CreatedDate { get; set; }
 
         public DateTime LastModifiedDate { get; set; }
+
+        public WorkQueueTypes WorkQueueType { get; set; }
     }
 }
