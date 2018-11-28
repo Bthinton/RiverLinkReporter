@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RiverLinkReporter.models
 {
@@ -9,7 +7,7 @@ namespace RiverLinkReporter.models
         TestPassword,
         GetData
     }
-    //WorkQueue _ID, WorkQueueType (CheckPassword, GetData), User_ID, Complete (bit), CreatedDate, LastMOdifiedDate
+
     public class WorkQueue
     {
         public int WorkQueue_id { get; set; }
