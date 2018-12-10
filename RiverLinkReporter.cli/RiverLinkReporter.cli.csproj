@@ -7,10 +7,15 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.3.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
-    <PackageReference Include="Newtonsoft.json" Version="11.0.2" />
-    <PackageReference Include="Nlog" Version="4.5.10" />
-    <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="1.4.0" />
+    <PackageReference Include="NLog" Version="4.5.11" />
+    <PackageReference Include="Selenium.Chrome.WebDriver" Version="2.43.0" />
+    <PackageReference Include="Selenium.Support" Version="3.141.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RiverLinkReporter.automation\RiverLinkReporter.automation.csproj" />
+    <ProjectReference Include="..\RiverLinkReporter.service\RiverLinkReporter.service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,7 +6,7 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace RiverLinkReporter.Service
+namespace RiverLinkReporter.service
 {
     #region IReadOnlyRepository
     public interface IReadOnlyRepository

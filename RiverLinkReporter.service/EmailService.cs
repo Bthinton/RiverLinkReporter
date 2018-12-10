@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using RiverLinkReporter.models;
 
-namespace RiverLinkReporter.Service
+namespace RiverLinkReporter.service
 {
     public interface IEmailService
     {

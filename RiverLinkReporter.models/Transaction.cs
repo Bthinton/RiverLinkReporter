@@ -2,10 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-//Sort same as transaction file
-//"attach" any real 
-
-namespace RiverLinkReport.Models
+namespace RiverLinkReporter.models
 {
     /// <summary>
     /// Main <c>Transaction</c> class where all properties are set

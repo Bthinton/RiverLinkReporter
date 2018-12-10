@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Linq;
 
-namespace RiverLinkReport.Models
+namespace RiverLinkReporter.models
 {
 
     public class RelatedJournalConverter : ConverterBase

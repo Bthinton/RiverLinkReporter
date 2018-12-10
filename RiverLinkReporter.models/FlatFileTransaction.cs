@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace RiverLinkReport.Models
+namespace RiverLinkReporter.models
 {
     /// <value>
     /// Defines plaza used for the transaction

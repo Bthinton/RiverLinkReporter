@@ -4,16 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using RiverLinkReport.Models;
 using RiverLinkReporter.models;
-using RiverLinkReporter.Service;
+using RiverLinkReporter.service;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
 
 
 namespace RiverLinkReporter.api.Controllers

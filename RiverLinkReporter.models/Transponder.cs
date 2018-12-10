@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RiverLinkReport.Models
+namespace RiverLinkReporter.models
 {
     /// <summary>
     /// Main <c>TransponderData</c> class where all properties are set

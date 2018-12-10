@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace RiverLinkReporter.Service
+namespace RiverLinkReporter.service
 {
 
     #region IRepository

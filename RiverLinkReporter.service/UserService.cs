@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
-namespace RiverLinkReporter.Service
+namespace RiverLinkReporter.service
 {
     public interface IUserService
     {

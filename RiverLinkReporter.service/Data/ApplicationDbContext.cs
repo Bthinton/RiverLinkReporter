@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using RiverLinkReport.Models;
+using RiverLinkReporter.models;
 
 namespace RiverLinkReporter.service.Data
 {
