@@ -6,10 +6,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RiverLinkReporter.models;
 using RiverLinkReporter.service.Data;
-using RiverLinkReporter.Service;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Threading.Tasks;
+using RiverLinkReporter.service;
 
 namespace RiverLinkReporter.API.Controllers
 {
